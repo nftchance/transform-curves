@@ -49,7 +49,7 @@ describe("TransformCurves", function () {
             );
 
             // zip coords together
-            const coords = x.map((x, i) => [x, y[i]]);
+            const coords = x.map((x, i) => [x / 1e18, y[i] / 1e18]);
 
             console.log(coords)
         });

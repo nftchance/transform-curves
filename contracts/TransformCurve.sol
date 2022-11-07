@@ -15,9 +15,11 @@ import "hardhat/console.sol";
 contract TransformCurve is
     Ownable
 {
-    using Strings for uint256;
+    using PRBMathSD59x18 for uint256;
 
     uint256 public N;
+
+    uint256 constant SCALE = 1e18 * 2 * Trigonometry.PI; // scale to add to trig inputs so same output is expected
 
     struct Circle {
         uint256 radius;
@@ -49,9 +51,10 @@ contract TransformCurve is
 
         for (uint256 i = 0; i < radii.length; i++) {
             for (uint256 j = 0; j < N; j++) {
-                y[j] += radii[i] * Trigonometry.sin(
-                    uint256(frequencies[i] * x[j] + phases[i])
-                );
+                uint256 degrees = uint256(frequencies[i] * x[j] + phases[i]);
+                int256 sine = Trigonometry.sin(degrees);
+
+                y[j] += radii[i] * sine;
             }
         }
     }
