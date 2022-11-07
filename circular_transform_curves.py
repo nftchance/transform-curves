@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Define the number of points to plot
-N = 5
+N = 10
 
 circles = [
     {
@@ -32,7 +32,7 @@ y = np.zeros(N)
 
 # Add the circles
 for circle in circles:
-    y += circle['radius'] * circle['frequency'] * x + circle['phase']
+    y += circle['radius'] * np.sin(circle['frequency'] * x + circle['phase'])
 
 # zip coords together
 coords = zip(x, y)

@@ -49,7 +49,9 @@ contract TransformCurve is
 
         for (uint256 i = 0; i < radii.length; i++) {
             for (uint256 j = 0; j < N; j++) {
-                y[j] += radii[i] * frequencies[i] * x[j] + phases[i];
+                y[j] += radii[i] * Trigonometry.sin(
+                    uint256(frequencies[i] * x[j] + phases[i])
+                );
             }
         }
     }
@@ -68,6 +70,22 @@ contract TransformCurve is
 
         for (uint256 i = 0; i < N; i++) {
             x[i] = start + (end - start) * int256(i) / (int256(N) - 1);
+        }
+    }
+
+    function validateSin() 
+        public
+        view
+        returns (
+              int256[] memory x
+            , int256[] memory y
+        )
+    { 
+        x = linSpace(0, int256(2 * Trigonometry.PI));
+        y = new int256[](N);
+
+        for (uint256 i = 0; i < N; i++) {
+            y[i] = Trigonometry.sin(uint256(x[i]));
         }
     }
 
