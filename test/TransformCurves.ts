@@ -54,6 +54,10 @@ describe("TransformCurves", function () {
             console.log(coords)
         });
     });
+    
+    // instantiate the labor market
+    // setup the pay curve
+    // simulate the pay curve and yoink all the indexes out
 });
 
 // it("Should set the right N", async function () {
