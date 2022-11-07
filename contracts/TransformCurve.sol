@@ -31,7 +31,6 @@ contract TransformCurve is
         N = _N;
     }
 
-    // Convert the above to Solidity without using rationals or complex numbers
     function getCurve(
           int256[] memory radii
         , int256[] memory frequencies
@@ -48,20 +47,12 @@ contract TransformCurve is
 
         y = new int256[](N);
 
-        for (uint256 i = 0; i < N; i++) {
-            for (uint256 j = 0; j < radii.length; j++) {
-                // Degrees that are provided by the circle
-                int256 degrees = frequencies[j] * x[i] + phases[j];
-                // Convert degrees to radians (range of 0 to 2pi) 
-                uint256 radians = uint256(degrees) * Trigonometry.PI / 180;
-
-                int256 sine = Trigonometry.sin(radians);
-
-                y[i] += radii[j] * sine;
+        for (uint256 i = 0; i < radii.length; i++) {
+            for (uint256 j = 0; j < N; j++) {
+                y[j] += radii[i] * frequencies[i] * x[j] + phases[i];
             }
         }
     }
-
 
     function linSpace(
           int256 start

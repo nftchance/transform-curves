@@ -32,12 +32,7 @@ y = np.zeros(N)
 
 # Add the circles
 for circle in circles:
-    # convert degree to radians
-    radians = np.pi / 4
-    # convert radians to degrees
-    degrees = radians * 180 / np.pi
-
-    y += circle['radius'] * np.sin(degrees)
+    y += circle['radius'] * circle['frequency'] * x + circle['phase']
 
 # zip coords together
 coords = zip(x, y)
