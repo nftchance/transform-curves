@@ -32,7 +32,7 @@ const CircleInput = ({
                     type="number"
                     id="frequency"
                     min="0"
-                    max="10"
+                    max="10000"
                     value={circle.frequency}
                     onChange={(e) => { handleCircleChange(circle.id, 'frequency', e.target.value) }}
                 />

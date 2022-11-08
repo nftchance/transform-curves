@@ -16,7 +16,7 @@
 
 .form-group {
   display: grid;
-  grid-template-columns: auto 3fr 3fr 3fr;
+  grid-template-columns: auto auto auto auto;
   grid-column-gap: 10px;
   margin-top: 20px;
 }
@@ -36,7 +36,7 @@
   margin-top: auto;
 }
 
-input {
+input, select {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
