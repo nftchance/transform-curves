@@ -72,7 +72,7 @@ contract TransformCurve is
      */
     function setCurve(
           uint256 _nonce
-        , Circle[] memory _circles
+        , Circle[] calldata _circles
     ) 
         public 
     {
