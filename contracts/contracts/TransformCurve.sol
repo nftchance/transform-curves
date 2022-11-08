@@ -135,7 +135,7 @@ contract TransformCurve is
         )
     {
         /// @dev Prepare the stack.
-        uint256 i;
+        int256 i;
         uint256 degrees;
         uint256 sine;
 
@@ -146,7 +146,7 @@ contract TransformCurve is
             i++
         ) {
             /// @dev Calculate the sine of the current x value.
-            degrees = uint256(frequencies[i] * int256(x) + phases[i]);
+            degrees = uint256(frequencies[i] * x + phases[i]);
             sine = T.sin(degrees);
 
             /// @dev Add the cumulative sine to the y-axis.
