@@ -30,8 +30,8 @@ If you would like a more detailed explanation of the implementation, join [cosan
 
 There are a few things going on here.
 
-1. My first rougb work of this implementation in Python which can be found in /model.
+1. My first rough work of this implementation in Python which can be found in /model.
 2. The solidity implementation of it in /contracts accompanied with tests.
     * Need to install hardhat and run `npx hardhat test`
-3. A supporting front-end to visualize created curves.
+3. A supporting front-end to visualize created curves in /frontend.
     * Need to run npm install and then `npm run dev`
