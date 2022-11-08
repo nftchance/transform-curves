@@ -9,6 +9,12 @@ interface TransformCurveInterface {
         uint256 phase;
     }
 
+    struct Curve {
+        address owner;
+        uint256 N;
+        Circle[] circles;
+    }
+
     /**
      * @notice curve returns the x and y coordinates of the curve defined by the input circles.
      * @param radii is an array of radii for the circles that define the curve.

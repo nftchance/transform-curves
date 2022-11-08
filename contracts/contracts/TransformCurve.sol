@@ -33,8 +33,7 @@ contract TransformCurve is
                                   STATE
     //////////////////////////////////////////////////////////////*/
 
-
-    uint256 public N;
+    mapping(bytes32 => Curve) public curves;
 
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
@@ -66,6 +65,28 @@ contract TransformCurve is
         N = _N;
     }
 
+    /**
+     * @notice Allows any user to set a curve using a personal nonce as their key.
+     * @param _nonce is the nonce used to generate the key.
+     * @param _circles is an array of circles that define the curve.
+     */
+    function setCurve(
+          uint256 _nonce
+        , Circle[] memory _circles
+    ) 
+        public 
+    {
+        bytes32 _curveId = keccak256(abi.encodePacked(
+              _msgSender()
+            , _nonce
+        ));
+
+        curves[_curveId] = Curve({
+              N: N
+            , circles: _circles
+        });
+    }
+
     /*//////////////////////////////////////////////////////////////
                                 GETTERS
     //////////////////////////////////////////////////////////////*/
@@ -73,10 +94,8 @@ contract TransformCurve is
     /**
      * See {TransformCurveInterface:curve}
      */
-   function curve(
-          int256[] memory radii
-        , int256[] memory frequencies
-        , int256[] memory phases
+    function curve(
+        bytes32 _curveId
     ) 
         public 
         view 
@@ -85,22 +104,26 @@ contract TransformCurve is
             , int256[] memory y
         ) 
     {
+        /// @dev Get the curve object.
+        Curve storage curve = curves[_curveId];
+
         /// @dev Create an equidistant x-axis starting at 0 and ending at 2 * PI.
         x = _linearSpace(0, int256(2 * T.PI));
 
         /// @dev Instantiate empty y-axis.
-        y = new int256[](N);
+        y = new int256[](curve.N);
 
         /// @dev Prepare the stack.
         uint256 i;
         uint256 j;
-        uint256 degrees;
-        uint256 sine;
+
+        /// @dev List of circles to apply to the x-axis.
+        Circle[] storage circles = curve.circles;
 
         /// @dev Loop through all of the circles
         for (
             i; 
-            i < radii.length; 
+            i < circles.length; 
             i++
         ) {
             /// @dev Loop through all the indexes of the curve.
@@ -109,12 +132,11 @@ contract TransformCurve is
                 j < N; 
                 j++
             ) {
-                /// @dev Calculate the sine of the current x value.
-                degrees = uint256(frequencies[i] * x[j] + phases[i]);
-                sine = T.sin(degrees);
-
                 /// @dev Add the cumulative sine to the y-axis.
-                y[j] += radii[i] * sine;
+                y[j] += circles[i].radius * T.sin(
+                    /// @dev Calculate the sine of the current x value.
+                    uint256(circles[i].frequency * x[j] + circles[i].phase)
+                );
             }
         }
     }
@@ -124,9 +146,7 @@ contract TransformCurve is
      */
     function index(
           uint256 x
-        , int256[] memory radii
-        , int256[] memory frequencies
-        , int256[] memory phases
+        , bytes32 _curveId
     )
         public
         view
@@ -134,23 +154,23 @@ contract TransformCurve is
               int256 y
         )
     {
+        /// @dev Get the list of circles 
+        Circle[] storage circles = curves[_curveId].circles;
+
         /// @dev Prepare the stack.
         int256 i;
-        uint256 degrees;
-        uint256 sine;
 
         /// @dev Loop through all of the circles
         for (
             i; 
-            i < radii.length; 
+            i < circles.length; 
             i++
         ) {
-            /// @dev Calculate the sine of the current x value.
-            degrees = uint256(frequencies[i] * x + phases[i]);
-            sine = T.sin(degrees);
-
             /// @dev Add the cumulative sine to the y-axis.
-            y += radii[i] * sine;
+            y += circles[i].radius * T.sin(
+                /// @dev Calculate the sine of the current x value.
+                uint256(circles[i].frequency * x + circles[i].phase)
+            );
         }
     }
 
