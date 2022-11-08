@@ -97,6 +97,7 @@ contract TransformCurve is
     function curve(
         bytes32 _curveId
     ) 
+        override
         public 
         view 
         returns (
@@ -144,10 +145,11 @@ contract TransformCurve is
     /**
      * See {TransformCurveInterface:index}
      */
-    function index(
+    function curveIndex(
           uint256 x
         , bytes32 _curveId
     )
+        override
         public
         view
         returns (
