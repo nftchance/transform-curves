@@ -23,6 +23,25 @@ const App = () => {
                 { id: 1, radius: 1, frequency: 0.25, phase: 270 },
             ],
         }, {
+            name: 'Linear',
+            circles: [
+                { id: 0, radius: 1, frequency: 0, phase: 0 },
+                { id: 1, radius: 3.8, frequency: 0.15, phase: 0 },
+            ],
+        }, {
+            name: 'S',
+            circles: [
+                { id: 0, radius: 1, frequency: 1.8, phase: 270 },
+                { id: 1, radius: 1, frequency: 0, phase: 0 },
+            ]     
+        }, {
+            name: 'Two-Tier',
+            circles: [
+                { id: 0, radius: 1, frequency: 1.8, phase: 270 },
+                { id: 1, radius: 5, frequency: 0.5, phase: 11 },
+                { id: 2, radius: 1, frequency: 4, phase: 3 },
+            ]
+        }, {
             name: 'Custom',
             circles: []
         }

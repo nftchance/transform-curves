@@ -33,6 +33,8 @@ const CirclePanel = ({
     }
 
     const handleCircleChange = (id: number, key: string, value: string) => {
+        handlePresetChange('Custom');
+
         const newCircles = circles.map(circle => {
             if (circle.id === id) {
                 return {
