@@ -5,7 +5,7 @@ pragma solidity ^0.8.17;
 import { TransformCurveInterface } from "./interfaces/TransformCurveInterface.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
-import "@prb/math/contracts/PRBMathSD59x18.sol";
+import { PRBMathSD59x18 as P } from "@prb/math/contracts/PRBMathSD59x18.sol";
 
 import { Trigonometry as T } from "./Trigonometry.sol";
 
