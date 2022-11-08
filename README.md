@@ -20,20 +20,18 @@ The margin of error is extremely small and can be improved with the use of $N$ a
 
 A low number of $N$ will result in a lower gas cost for the curve evaluation. Additionally, when there are few circles and the values are small, the error is negligible. However, if the values are large, the error will be larger and thus the curve will be less accurate. This can be countered (to an extent) with the increase of $N$.
 
-To implement this, we use the following formula:
-
-$$
-\begin{aligned}
-\theta &= \frac{2 \pi}{N} \\
-x &= r \cos(\theta) \\
-y &= r \sin(\theta)
-\end{aligned}
-$$
-
-Where $r$ is the radius of the circle, $N$ is the number of points in the curve and $\theta$ is the angle of the point.
-
 This enables the ability to construct curves using (a far more detailed process than illustrated below) such as:
 
 ![The mechanism to build a curve](./images/any-curve.png)
 
 If you would like a more detailed explanation of the implementation, join [cosanostra](https://cosanostra.gg) on [Discord](https://discord.com/invite/TASvMj4vyk).
+
+## Usage
+
+There are a few things going on here.
+
+1. My first rougb work of this implementation in Python which can be found in /model.
+2. The solidity implementation of it in /contracts accompanied with tests.
+    * Need to install hardhat and run `npx hardhat test`
+3. A supporting front-end to visualize created curves.
+    * Need to run npm install and then `npm run dev`
