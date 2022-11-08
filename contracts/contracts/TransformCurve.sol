@@ -70,6 +70,26 @@ contract TransformCurve is
         }
     }
 
+    function eval(
+          uint256 x
+        , int256[] memory radii
+        , int256[] memory frequencies
+        , int256[] memory phases
+    )
+        public
+        view
+        returns (
+              int256 y
+        )
+    {
+        for (uint256 i = 0; i < radii.length; i++) {
+            uint256 degrees = uint256(frequencies[i] * int256(x) + phases[i]);
+            int256 sine = Trigonometry.sin(degrees);
+
+            y += radii[i] * sine;
+        }
+    }
+
     function linSpace(
           int256 start
         , int256 end
