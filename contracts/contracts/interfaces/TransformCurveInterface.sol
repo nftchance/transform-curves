@@ -4,13 +4,12 @@ pragma solidity ^0.8.17;
 
 interface TransformCurveInterface {
     struct Circle {
-        uint256 radius;
-        uint256 frequency;
-        uint256 phase;
+        int256 radius;
+        int256 frequency;
+        int256 phase;
     }
 
     struct Curve {
-        address owner;
         uint256 N;
         Circle[] circles;
     }
@@ -21,7 +20,7 @@ interface TransformCurveInterface {
      * @return x is an array of x coordinates.
      * @return y is an array of y coordinates.
      */
-    function curve(
+    function getCurve(
         bytes32 curveId
     ) 
         external 
@@ -37,8 +36,8 @@ interface TransformCurveInterface {
      * @param curveId is the id of the curve.
      * @return y is the y coordinate of the point on the curve.
      */
-    function curveIndex(
-          uint256 x
+    function getCurveIndex(
+          int256 x
         , bytes32 curveId
     )
         external

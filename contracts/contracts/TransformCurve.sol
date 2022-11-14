@@ -39,31 +39,11 @@ contract TransformCurve is
                                CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
-    constructor(
-        uint256 _N
-    ) {
-        N = _N;
-    }
+    constructor() {}
 
     /*//////////////////////////////////////////////////////////////
                                 SETTERS
     //////////////////////////////////////////////////////////////*/
-
-    /**
-     * @notice Allows the owner to update the number of points used to define the curve.
-     * @param _N is the new number of points used to define the curve.
-     * 
-     * Requirements:
-     * - Caller must be the owner.
-     */
-    function setN(
-        uint256 _N
-    ) 
-        public 
-        onlyOwner 
-    {
-        N = _N;
-    }
 
     /**
      * @notice Allows any user to set a curve using a personal nonce as their key.
@@ -72,6 +52,7 @@ contract TransformCurve is
      */
     function setCurve(
           uint256 _nonce
+        , uint256 N
         , Circle[] calldata _circles
     ) 
         public 
@@ -94,7 +75,7 @@ contract TransformCurve is
     /**
      * See {TransformCurveInterface:curve}
      */
-    function curve(
+    function getCurve(
         bytes32 _curveId
     ) 
         override
@@ -109,7 +90,11 @@ contract TransformCurve is
         Curve storage curve = curves[_curveId];
 
         /// @dev Create an equidistant x-axis starting at 0 and ending at 2 * PI.
-        x = _linearSpace(0, int256(2 * T.PI));
+        x = _linearSpace(
+              curve.N
+            , 0
+            , int256(2 * T.PI)
+        );
 
         /// @dev Instantiate empty y-axis.
         y = new int256[](curve.N);
@@ -130,7 +115,7 @@ contract TransformCurve is
             /// @dev Loop through all the indexes of the curve.
             for (
                 j; 
-                j < N; 
+                j < curve.N; 
                 j++
             ) {
                 /// @dev Add the cumulative sine to the y-axis.
@@ -145,8 +130,8 @@ contract TransformCurve is
     /**
      * See {TransformCurveInterface:index}
      */
-    function curveIndex(
-          uint256 x
+    function getCurveIndex(
+          int256 x
         , bytes32 _curveId
     )
         override
@@ -160,7 +145,7 @@ contract TransformCurve is
         Circle[] storage circles = curves[_curveId].circles;
 
         /// @dev Prepare the stack.
-        int256 i;
+        uint256 i;
 
         /// @dev Loop through all of the circles
         for (
@@ -183,29 +168,31 @@ contract TransformCurve is
     /**
      * @notice _linearSpace is a private function that returns an array of N equidistant values between a start and end.
      * @dev This function is written to heavily mirror the implementation of numpy.linspace.
+     * @param _N is the number of values to return.
      * @param _start The start of the range.
      * @param _end The end of the range.
-     * @return _space An array of N equidistant values between a start and end.
+     * @return space An array of N equidistant values between a start and end.
      */
     function _linearSpace(
-          int256 start
-        , int256 end
+          uint256 _N
+        , int256 _start
+        , int256 _end
     ) 
         internal 
-        view 
+        pure 
         returns (
-              int256[] memory x
+              int256[] memory space
         ) 
     {
-        x = new int256[](N);
+        space = new int256[](_N);
 
-        int256 i;
+        uint256 i;
         for (
             i; 
-            i < N; 
+            i < _N; 
             i++
         ) {
-            x[i] = start + (end - start) * i / (int256(N) - 1);
+            space[i] = _start + (_end - _start) * int256(i) / (int256(_N) - 1);
         }
     }
 }
