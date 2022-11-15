@@ -88,5 +88,8 @@ describe("Transform Curves", function () {
 
             expect(tx.toNumber()).to.equal(5);
         });
+
+        // TODO: test getCurve
+        // TODO: test getCurveIndex
     });
 });

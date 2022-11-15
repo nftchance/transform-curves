@@ -120,8 +120,8 @@ contract TransformCurve is
               curve.N
             , _pageLength
             , _page
-            , 0
-            , int256(2 * T.PI)
+            , 0                     /// TODO: Make controllable.
+            , int256(2 * T.PI)      /// TODO: Make controllable.
        );
 
         /// @dev Prepare the stack.
