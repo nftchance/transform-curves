@@ -190,22 +190,23 @@ contract TransformCurve is
         /// @dev Controls how many points on the x-axis are used to define the curve.
         space = new int256[](_N);
 
-        /// @dev Get N in the form of a fixed point number.
-        int256 recastedN = int256(_N);
+        /// @dev Calculate the step size.
+        int256 linearSpace = getLinearSpaceIndex(
+              int256(_N)
+            , _start
+            , _end
+            , 1
+        );
 
-        /// @dev Loop through the indexes and create the proper PI value.
-        uint256 i;
+        /// @dev Prepare the loop stack.
+        uint i = 1;
         for (
             i; 
             i < _N; 
             i++
         ) {
-            space[i] = getLinearSpace(
-                  recastedN
-                , _start
-                , _end
-                , int256(i)
-            );
+            /// @dev Calculate the next equidistant index.
+            space[i] = space[i - 1] + linearSpace;
         }
     }
 
@@ -216,7 +217,7 @@ contract TransformCurve is
      * @param _end The end of the range.
      * @param _i The index of the value to return.
      */
-    function getLinearSpace(
+    function getLinearSpaceIndex(
           int256 _N
         , int256 _start
         , int256 _end
