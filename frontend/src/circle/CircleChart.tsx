@@ -6,22 +6,30 @@ import Circle from "../types/Circle";
 
 const CircleChart = ({
     N,
+    start,
+    end,
     circles
 }: {
     N: number,
+    start: number,
+    end: number,
     circles: Circle[]
 }) => {
     const points = useMemo(() => {
         const points: number[][] = [];
 
+        const step = end / N;
+
+        // create x-axis array with equidistance points between start and end
+        const x = Array.from({ length: N }, (_, i) => start + i * step);
+
         for (let i = 0; i < N; i++) {
             let y = 0;
-            let x = i;
             circles.forEach((circle) => {
-                y += circle.radius * Math.sin((circle.frequency * i + circle.phase) * Math.PI / 180);
+                y += circle.radius * Math.sin((circle.frequency * x[i] + circle.phase) * Math.PI / 180);
             });
 
-            points.push([x, y]);
+            points.push([x[i], y]);
         }
 
         console.log(points)

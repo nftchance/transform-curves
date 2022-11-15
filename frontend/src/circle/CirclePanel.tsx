@@ -7,17 +7,25 @@ const CirclePanel = ({
     preset,
     presets,
     N,
+    start,
+    end,
     circles,
     handlePresetChange,
     setN,
+    setStart,
+    setEnd,
     setCircles,
 }: {
     preset: Preset,
     presets: Preset[],
     N: number,
+    start: number,
+    end: number,
     circles: Circle[],
     handlePresetChange: (preset: string) => void,
     setN: (N: number) => void,
+    setStart: (start: number) => void,
+    setEnd: (end: number) => void,
     setCircles: (circles: Circle[]) => void,
 }) => {
     const handleCircleAddition = () => {
@@ -85,6 +93,38 @@ const CirclePanel = ({
                         max="90"
                         value={N}
                         onChange={(e) => { setN(Number(e.target.value)) }}
+                    />
+                </div>
+            </div>
+
+            <div className="form-group" style={{
+                gridTemplateColumns: "1fr"
+            }}>
+                <div className="input-group">
+                    <label htmlFor="start">Start</label>
+                    <input
+                        type="number"
+                        id="start"
+                        min="0"
+                        max={2 * Math.PI}
+                        value={start}
+                        onChange={(e) => { setStart(Number(e.target.value)) }}
+                    />
+                </div>
+            </div>
+
+            <div className="form-group" style={{
+                gridTemplateColumns: "1fr"
+            }}>
+                <div className="input-group">
+                    <label htmlFor="end">End</label>
+                    <input
+                        type="number"
+                        id="end"
+                        min="0"
+                        max={2 * Math.PI}
+                        value={end}
+                        onChange={(e) => { setEnd(Number(e.target.value)) }}
                     />
                 </div>
             </div>

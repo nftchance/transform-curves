@@ -48,6 +48,8 @@ const App = () => {
     ]
 
     const [N, setN] = useState(100);
+    const [start, setStart] = useState(0);
+    const [end, setEnd] = useState(2 * Math.PI);
     const [preset, setPreset] = useState<Preset>(presets[0])
     const [circles, setCircles] = useState<Circle[]>(presets[0].circles);
 
@@ -70,6 +72,8 @@ const App = () => {
             <div className="chart">
                 <CircleChart 
                     N={N}
+                    start={start}
+                    end={end}
                     circles={circles} 
                 />
             </div>
@@ -78,9 +82,13 @@ const App = () => {
                     preset={preset}
                     presets={presets}
                     N={N}
+                    start={start}
+                    end={end}
                     circles={circles}
                     handlePresetChange={handlePresetChange}
                     setN={setN}
+                    setStart={setStart}
+                    setEnd={setEnd}
                     setCircles={setCircles}
                 />
             </div>
