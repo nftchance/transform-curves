@@ -50,6 +50,33 @@ describe("Transform Curves", function () {
             expect(args[0]).to.equal(expectedCurveId);
         });
 
+        it("Should have equidistant points", async() => { 
+            const { transformCurve } = await loadFixture(deployTransformCurveFixture);
+
+            const N = 11;
+            const pageLength = N;
+            const page = 0;
+
+            const start = 0;
+            const end = 50;
+
+            const tx = await transformCurve.getLinearSpace(N, pageLength, page, start, end);
+
+            // get the array of points and format them nicely
+            const points = tx.map((point: any) => {
+                return [point[0].toNumber(), point[1].toNumber()];
+            });
+
+            expect(points).to.deep.equal([
+                [ 0, 0 ],  [ 5, 0 ],
+                [ 10, 0 ], [ 15, 0 ],
+                [ 20, 0 ], [ 25, 0 ],
+                [ 30, 0 ], [ 35, 0 ],
+                [ 40, 0 ], [ 45, 0 ],
+                [ 50, 0 ]
+              ]);
+        })
+
         // it("Should get the correct curve", async function () {
         //     const { transformCurve } = await loadFixture(deployTransformCurveFixture);
 

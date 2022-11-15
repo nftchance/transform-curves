@@ -19,17 +19,13 @@ interface TransformCurveInterface {
      * @param nonce is the nonce used to generate the key.
      * @param N is the number of points to use when evaluating the curve.
      * @param circles is an array of circles that define the curve.
-     * @return curveId is the key used to store the curve.
      */
     function setCurve(
           uint256 nonce
         , uint256 N
         , Circle[] calldata circles
     )
-        external
-        returns (
-            bytes32 curveId
-        );
+        external;
 
     /**
      * @notice curve returns the x and y coordinates of the curve defined by the input circles.
@@ -46,7 +42,7 @@ interface TransformCurveInterface {
         external 
         view 
         returns (
-            int256[][2] memory points
+            int256[][] memory points
         );
 
     /**

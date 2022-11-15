@@ -56,13 +56,10 @@ contract TransformCurve is
         , Circle[] memory _circles
     ) 
         override
-        public 
-        returns (
-            bytes32 curveId
-        )
+        public
     {
         /// @dev Create the caller-specific key.
-        curveId = keccak256(abi.encode(
+        bytes32 curveId = keccak256(abi.encode(
               _msgSender()
             , _nonce
         ));
@@ -112,7 +109,7 @@ contract TransformCurve is
         public 
         view 
         returns (
-            int256[][2] memory points
+            int256[][] memory points
         ) 
     {
         /// @dev Get the curve object.
@@ -210,9 +207,12 @@ contract TransformCurve is
         public 
         pure 
         returns (
-            int256[][2] memory space
+            int256[][] memory space
         ) 
     {
+        /// @dev Prepare the stack.
+        space = new int256[][](_pageLength);
+
         /// @dev Loop through the indexes and create the proper PI value.
         uint256 i = _page * _pageLength;
         for (
@@ -220,7 +220,8 @@ contract TransformCurve is
             i < _N && i < (_page + 1) * _pageLength; 
             i++
         ) {
-            /// @dev Calculate the current x value.
+            space[i] = new int256[](2);
+
             space[i][0] = linearSpaceIndex(
                   int256(_N)
                 , _start
