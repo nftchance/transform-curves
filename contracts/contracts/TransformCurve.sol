@@ -5,8 +5,6 @@ pragma solidity ^0.8.17;
 import { TransformCurveInterface } from "./interfaces/TransformCurveInterface.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
-import { PRBMathSD59x18 as P } from "@prb/math/contracts/PRBMathSD59x18.sol";
-
 import { Trigonometry as T } from "./Trigonometry.sol";
 
 /**
@@ -27,13 +25,17 @@ contract TransformCurve is
       TransformCurveInterface
     , Ownable
 {
-    using P for uint256;
-
     /*//////////////////////////////////////////////////////////////
                                   STATE
     //////////////////////////////////////////////////////////////*/
 
     mapping(bytes32 => Curve) public curves;
+
+    event CurveSet(
+          bytes32 indexed curveId /// @dev encode address and curve nonce
+        , uint256 indexed N
+        , Circle[] indexed circles
+    );
 
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
@@ -51,22 +53,39 @@ contract TransformCurve is
     function setCurve(
           uint256 _nonce
         , uint256 N
-        , Circle[] calldata _circles
+        , Circle[] memory _circles
     ) 
         override
         public 
     {
         /// @dev Create the caller-specific key.
-        bytes32 _curveId = keccak256(abi.encodePacked(
+        bytes32 _curveId = keccak256(abi.encode(
               _msgSender()
             , _nonce
         ));
 
-        /// @dev Associate the curve to the caller.
-        curves[_curveId] = Curve({
-              N: N
-            , circles: _circles
-        });
+        /// @dev Get the Curve object out of the contract.
+        Curve storage curve = curves[_curveId];
+
+        /// @dev Set the number of points.
+        curve.N = N;
+
+        /// @dev Set the circles.
+        uint256 i;
+        for (
+            i; 
+            i < _circles.length; 
+            i++
+        ) {
+            curve.circles[i] = _circles[i];
+        }
+
+        /// @dev Emit the event.
+        emit CurveSet(
+              _curveId
+            , N
+            , _circles
+        );
     }
 
     /*////////////////////////////////////////////////////////////
@@ -77,28 +96,28 @@ contract TransformCurve is
      * See {TransformCurveInterface:getCurve}
      */
     function getCurve(
-        bytes32 _curveId
+          bytes32 _curveId
+        , uint256 _pageLength
+        , uint256 _page
     ) 
         override
         public 
         view 
         returns (
-              int256[] memory x
-            , int256[] memory y
+            int256[][2] memory points
         ) 
     {
         /// @dev Get the curve object.
         Curve storage curve = curves[_curveId];
         
         /// @dev Create an equidistant x-axis starting at 0 and ending at 2 * PI.
-        x = getLinearSpaceArray(
+        points = getLinearSpace(
               curve.N
+            , _pageLength
+            , _page
             , 0
             , int256(2 * T.PI)
-        );
-
-        /// @dev Instantiate empty y-axis with the depth of the x-axis.
-        y = new int256[](curve.N);
+       );
 
         /// @dev Prepare the stack.
         uint256 i;
@@ -111,7 +130,7 @@ contract TransformCurve is
         /// @dev Is done in this order to prevent opening a huuuuuge loop multiple times.
         for (
             i; 
-            i < curve.N; 
+            i < _pageLength; 
             i++
         ) {
             /// @dev Loop through all of the circles.
@@ -120,11 +139,10 @@ contract TransformCurve is
                 j < circles.length; 
                 j++
             ) {
-            
                 /// @dev Add the cumulative sine to the y-axis.
-                y[i] += circles[j].radius * T.sin(
+                points[i][1] += circles[j].radius * T.sin(
                     /// @dev Calculate the sine of the current x value.
-                    uint256(circles[j].frequency * x[i] + circles[j].phase)
+                    uint256(circles[j].frequency * points[i][0] + circles[j].phase)
                 );
             }
         }
@@ -164,49 +182,42 @@ contract TransformCurve is
         }
     }
 
-    /*//////////////////////////////////////////////////////////////
-                            INTERNAL GETTERS
-    //////////////////////////////////////////////////////////////*/
-
     /**
      * @notice _linearSpace is a private function that returns an array of N equidistant values between a start and end.
      * @dev This function is written to heavily mirror the implementation of numpy.linspace.
      * @param _N is the number of values to return.
+     * @param _pageLength The number of values to return per page.
+     * @param _page The page to return.
      * @param _start The start of the range.
      * @param _end The end of the range.
-     * @return space An array of N equidistant values between a start and end.
+    * @return space An array of N equidistant values between a start and end.
      */
-    function getLinearSpaceArray(
+    function getLinearSpace(
           uint256 _N
+        , uint256 _pageLength
+        , uint256 _page
         , int256 _start
         , int256 _end
     ) 
         public 
         pure 
         returns (
-              int256[] memory space
+            int256[][2] memory space
         ) 
     {
-        /// @dev Controls how many points on the x-axis are used to define the curve.
-        space = new int256[](_N);
-
-        /// @dev Calculate the step size.
-        int256 linearSpace = getLinearSpaceIndex(
-              int256(_N)
-            , _start
-            , _end
-            , 1
-        );
-
-        /// @dev Prepare the loop stack.
-        uint i = 1;
+        /// @dev Loop through the indexes and create the proper PI value.
+        uint256 i = _page * _pageLength;
         for (
             i; 
-            i < _N; 
+            i < _N && i < (_page + 1) * _pageLength; 
             i++
         ) {
-            /// @dev Calculate the next equidistant index.
-            space[i] = space[i - 1] + linearSpace;
+            space[i][0] = linearSpaceIndex(
+                  int256(_N)
+                , _start
+                , _end
+                , int256(i)
+            );
         }
     }
 
@@ -217,7 +228,7 @@ contract TransformCurve is
      * @param _end The end of the range.
      * @param _i The index of the value to return.
      */
-    function getLinearSpaceIndex(
+    function linearSpaceIndex(
           int256 _N
         , int256 _start
         , int256 _end
