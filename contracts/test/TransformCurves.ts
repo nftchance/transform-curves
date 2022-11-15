@@ -2,11 +2,9 @@ import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("TransformCurves", function () {
-    const N = 10;
-
+describe("Transform Curves", function () {
     async function deployTransformCurveFixture() {
-        const [deployer] = await ethers.getSigners();
+        const [deployer, operator] = await ethers.getSigners();
 
         const TransformCurve = await ethers.getContractFactory("TransformCurve");
         const transformCurve = await TransformCurve.deploy();
@@ -14,7 +12,7 @@ describe("TransformCurves", function () {
         return { deployer, transformCurve };
     }
 
-    describe("Deployment", function () {
+    describe("Make sure the magic curve works.", function () {
         it("Should deploy the contract", async function () {
             const { transformCurve } = await loadFixture(deployTransformCurveFixture);
 
@@ -27,11 +25,30 @@ describe("TransformCurves", function () {
             expect(await transformCurve.owner()).to.equal(deployer.address);
         });
 
-        // it("Should set the correct N value", async function () {
-        //     const { transformCurve } = await loadFixture(deployTransformCurveFixture);
+        it("Should set curve", async function () {
+            const { transformCurve } = await loadFixture(deployTransformCurveFixture);
 
-        //     expect(await transformCurve.N()).to.equal(N);
-        // });
+            const nonce = 0;
+            const N = 15;
+
+            const circles = [{
+                radius: 0,
+                frequency: 0,
+                phase: 0,
+            }]
+
+            const [deployer, operator] = await ethers.getSigners();
+
+            const tx = await transformCurve.connect(operator).setCurve(nonce, N, circles);
+            const rc = await tx.wait();
+
+            const event = rc.events.find((e: {event: string}) => e.event === "CurveSet");
+            const args = event.args;
+
+            const expectedCurveId = '0x14e04a66bf74771820a7400ff6cf065175b3d7eb25805a5bd1633b161af5d101';
+
+            expect(args[0]).to.equal(expectedCurveId);
+        });
 
         // it("Should get the correct curve", async function () {
         //     const { transformCurve } = await loadFixture(deployTransformCurveFixture);

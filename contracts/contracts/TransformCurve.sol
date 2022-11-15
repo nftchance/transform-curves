@@ -57,32 +57,40 @@ contract TransformCurve is
     ) 
         override
         public 
+        returns (
+            bytes32 curveId
+        )
     {
         /// @dev Create the caller-specific key.
-        bytes32 _curveId = keccak256(abi.encode(
+        curveId = keccak256(abi.encode(
               _msgSender()
             , _nonce
         ));
 
         /// @dev Get the Curve object out of the contract.
-        Curve storage curve = curves[_curveId];
+        Curve storage curve = curves[curveId];
 
         /// @dev Set the number of points.
         curve.N = N;
 
-        /// @dev Set the circles.
+        /// @dev Prepare the loop stack.
         uint256 i;
+
+        /// @dev Clear the existing circles.
+        delete curve.circles;
+
+        /// @dev Set the circles.
         for (
             i; 
             i < _circles.length; 
             i++
         ) {
-            curve.circles[i] = _circles[i];
+            curve.circles.push(_circles[i]);
         }
 
         /// @dev Emit the event.
         emit CurveSet(
-              _curveId
+              curveId
             , N
             , _circles
         );
@@ -212,6 +220,7 @@ contract TransformCurve is
             i < _N && i < (_page + 1) * _pageLength; 
             i++
         ) {
+            /// @dev Calculate the current x value.
             space[i][0] = linearSpaceIndex(
                   int256(_N)
                 , _start
@@ -240,6 +249,7 @@ contract TransformCurve is
             int256 space
         )
     { 
+        /// @dev Calculate the current x value.
         space = _start + (_end - _start) * _i / (_N - 1);
     }
 }
