@@ -46,34 +46,35 @@ contract TransformCurve is
     //////////////////////////////////////////////////////////////*/
 
     /**
-     * @notice Allows any user to set a curve using a personal nonce as their key.
-     * @param _nonce is the nonce used to generate the key.
-     * @param _circles is an array of circles that define the curve.
-     */
+     * See {TransformCurveInterface:setCurve}
+     */        
     function setCurve(
           uint256 _nonce
         , uint256 N
         , Circle[] calldata _circles
     ) 
+        override
         public 
     {
+        /// @dev Create the caller-specific key.
         bytes32 _curveId = keccak256(abi.encodePacked(
               _msgSender()
             , _nonce
         ));
 
+        /// @dev Associate the curve to the caller.
         curves[_curveId] = Curve({
               N: N
             , circles: _circles
         });
     }
 
-    /*//////////////////////////////////////////////////////////////
+    /*////////////////////////////////////////////////////////////
                                 GETTERS
     //////////////////////////////////////////////////////////////*/
 
     /**
-     * See {TransformCurveInterface:curve}
+     * See {TransformCurveInterface:getCurve}
      */
     function getCurve(
         bytes32 _curveId
@@ -88,15 +89,15 @@ contract TransformCurve is
     {
         /// @dev Get the curve object.
         Curve storage curve = curves[_curveId];
-
+        
         /// @dev Create an equidistant x-axis starting at 0 and ending at 2 * PI.
-        x = _linearSpace(
+        x = getLinearSpaceArray(
               curve.N
             , 0
             , int256(2 * T.PI)
         );
 
-        /// @dev Instantiate empty y-axis.
+        /// @dev Instantiate empty y-axis with the depth of the x-axis.
         y = new int256[](curve.N);
 
         /// @dev Prepare the stack.
@@ -106,29 +107,31 @@ contract TransformCurve is
         /// @dev List of circles to apply to the x-axis.
         Circle[] storage circles = curve.circles;
 
-        /// @dev Loop through all of the circles
+        /// @dev Loop through all the indexes of the curve.
+        /// @dev Is done in this order to prevent opening a huuuuuge loop multiple times.
         for (
             i; 
-            i < circles.length; 
+            i < curve.N; 
             i++
         ) {
-            /// @dev Loop through all the indexes of the curve.
+            /// @dev Loop through all of the circles.
             for (
                 j; 
-                j < curve.N; 
+                j < circles.length; 
                 j++
             ) {
+            
                 /// @dev Add the cumulative sine to the y-axis.
-                y[j] += circles[i].radius * T.sin(
+                y[i] += circles[j].radius * T.sin(
                     /// @dev Calculate the sine of the current x value.
-                    uint256(circles[i].frequency * x[j] + circles[i].phase)
+                    uint256(circles[j].frequency * x[i] + circles[j].phase)
                 );
             }
         }
     }
 
     /**
-     * See {TransformCurveInterface:index}
+     * See {TransformCurveInterface:getCurveIndex}
      */
     function getCurveIndex(
           int256 x
@@ -173,26 +176,58 @@ contract TransformCurve is
      * @param _end The end of the range.
      * @return space An array of N equidistant values between a start and end.
      */
-    function _linearSpace(
+    function getLinearSpaceArray(
           uint256 _N
         , int256 _start
         , int256 _end
     ) 
-        internal 
+        public 
         pure 
         returns (
               int256[] memory space
         ) 
     {
+        /// @dev Controls how many points on the x-axis are used to define the curve.
         space = new int256[](_N);
 
+        /// @dev Get N in the form of a fixed point number.
+        int256 recastedN = int256(_N);
+
+        /// @dev Loop through the indexes and create the proper PI value.
         uint256 i;
         for (
             i; 
             i < _N; 
             i++
         ) {
-            space[i] = _start + (_end - _start) * int256(i) / (int256(_N) - 1);
+            space[i] = getLinearSpace(
+                  recastedN
+                , _start
+                , _end
+                , int256(i)
+            );
         }
+    }
+
+    /**
+     * @notice Utility function to calculate the value of a single index in the linear space array.
+     * @param _N is the number of values in the array.
+     * @param _start The start of the range.
+     * @param _end The end of the range.
+     * @param _i The index of the value to return.
+     */
+    function getLinearSpace(
+          int256 _N
+        , int256 _start
+        , int256 _end
+        , int256 _i
+    ) 
+        public
+        pure
+        returns (
+            int256 space
+        )
+    { 
+        space = _start + (_end - _start) * _i / (_N - 1);
     }
 }

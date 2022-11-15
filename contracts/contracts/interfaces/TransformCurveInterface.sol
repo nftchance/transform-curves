@@ -15,6 +15,18 @@ interface TransformCurveInterface {
     }
 
     /**
+     * @notice Allows any user to set a curve using a personal nonce as their key.
+     * @param _nonce is the nonce used to generate the key.
+     * @param _circles is an array of circles that define the curve.
+     */
+    function setCurve(
+          uint256 nonce
+        , uint256 N
+        , Circle[] calldata circles
+    )
+        external;
+
+    /**
      * @notice curve returns the x and y coordinates of the curve defined by the input circles.
      * @param curveId is the id of the curve.
      * @return x is an array of x coordinates.
