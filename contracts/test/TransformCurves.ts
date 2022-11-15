@@ -77,27 +77,16 @@ describe("Transform Curves", function () {
               ]);
         })
 
-        // it("Should get the correct curve", async function () {
-        //     const { transformCurve } = await loadFixture(deployTransformCurveFixture);
+        it("Should be able to calculate an equidistant index to an x on the x-axis", async() => {
+            const { transformCurve } = await loadFixture(deployTransformCurveFixture);
 
-        //     const radii = [1,1,1];
-        //     const frequencies = [1,2,3];
-        //     const phases = [0,0,0];
+            const N = 11;
+            const start = 0;
+            const end = 50;
 
-        //     const {x,y} = await transformCurve.getCurve(
-        //         radii,
-        //         frequencies,
-        //         phases
-        //     );
+            const tx = await transformCurve.getLinearSpaceIndex(N, start, end, 1);
 
-        //     // zip coords together
-        //     const coords = x.map((x: number, i: number) => [x / 1e18, y[i] / 1e18]);
-
-        //     console.log(coords)
-        // });
+            expect(tx.toNumber()).to.equal(5);
+        });
     });
-    
-    // instantiate the labor market
-    // setup the pay curve
-    // simulate the pay curve and yoink all the indexes out
 });

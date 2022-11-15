@@ -222,7 +222,7 @@ contract TransformCurve is
         ) {
             space[i] = new int256[](2);
 
-            space[i][0] = linearSpaceIndex(
+            space[i][0] = getLinearSpaceIndex(
                   int256(_N)
                 , _start
                 , _end
@@ -238,7 +238,7 @@ contract TransformCurve is
      * @param _end The end of the range.
      * @param _i The index of the value to return.
      */
-    function linearSpaceIndex(
+    function getLinearSpaceIndex(
           int256 _N
         , int256 _start
         , int256 _end
