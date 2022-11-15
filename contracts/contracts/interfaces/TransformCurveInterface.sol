@@ -12,6 +12,8 @@ interface TransformCurveInterface {
     struct Curve {
         uint256 N;
         Circle[] circles;
+        int256 start;
+        int256 end;
     }
 
     /**
@@ -19,11 +21,15 @@ interface TransformCurveInterface {
      * @param nonce is the nonce used to generate the key.
      * @param N is the number of points to use when evaluating the curve.
      * @param circles is an array of circles that define the curve.
+     * @param start is the start x-axis.
+     * @param end is the last value of the x-axis.
      */
     function setCurve(
           uint256 nonce
         , uint256 N
         , Circle[] calldata circles
+        , int256 start
+        , int256 end
     )
         external;
 

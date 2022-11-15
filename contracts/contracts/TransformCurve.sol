@@ -35,6 +35,8 @@ contract TransformCurve is
           bytes32 indexed curveId /// @dev encode address and curve nonce
         , uint256 indexed N
         , Circle[] indexed circles
+        , int256 start
+        , int256 end
     );
 
     /*//////////////////////////////////////////////////////////////
@@ -52,8 +54,10 @@ contract TransformCurve is
      */        
     function setCurve(
           uint256 _nonce
-        , uint256 N
+        , uint256 _N
         , Circle[] memory _circles
+        , int256 _start
+        , int256 _end
     ) 
         override
         public
@@ -68,7 +72,13 @@ contract TransformCurve is
         Curve storage curve = curves[curveId];
 
         /// @dev Set the number of points.
-        curve.N = N;
+        curve.N = _N;
+        
+        /// @dev Set the first value of the x-axis.
+        curve.start = _start;
+
+        /// @dev Set the last value of the x-axis.
+        curve.end = _end;
 
         /// @dev Prepare the loop stack.
         uint256 i;
@@ -88,8 +98,10 @@ contract TransformCurve is
         /// @dev Emit the event.
         emit CurveSet(
               curveId
-            , N
+            , _N
             , _circles
+            , _start
+            , _end
         );
     }
 
@@ -118,10 +130,10 @@ contract TransformCurve is
         /// @dev Create an equidistant x-axis starting at 0 and ending at 2 * PI.
         points = getLinearSpace(
               curve.N
+            , curve.start
+            , curve.end
             , _pageLength
             , _page
-            , 0                     /// TODO: Make controllable.
-            , int256(2 * T.PI)      /// TODO: Make controllable.
        );
 
         /// @dev Prepare the stack.
@@ -199,10 +211,10 @@ contract TransformCurve is
      */
     function getLinearSpace(
           uint256 _N
-        , uint256 _pageLength
-        , uint256 _page
         , int256 _start
         , int256 _end
+        , uint256 _pageLength
+        , uint256 _page
     ) 
         public 
         pure 
